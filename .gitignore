@@ -1,0 +1,32 @@
+# Environnements virtuels
+venv/
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Tests / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Logs & reports
+data/reports/*.log
+data/reports/*.json
+data/reports/*.csv
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
