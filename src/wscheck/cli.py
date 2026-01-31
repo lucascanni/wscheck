@@ -1,6 +1,7 @@
 import typer
 
 from wscheck.checks.system import collect_system
+from wscheck.checks.network import collect_network
 
 app = typer.Typer(help="wscheck - Workstation Health Check CLI")
 
@@ -21,21 +22,24 @@ def hello():
     print("wscheck ready")
 
 
-def _print_system_report(system: dict) -> None:
+def _print_section(title: str, data: dict) -> None:
     """
-    Print system health data in a readable, multi-line format.
+    Print a section (title + key/value pairs) in a readable multi-line format.
     """
-    print("\nSystem Health Check")
-    print("-" * 30)
-
-    for key, value in system.items():
+    print(f"\n{title}")
+    print("-" * len(title))
+    for key, value in data.items():
         print(f"{key:20} : {value}")
 
 
 @app.command("scan")
 def scan():
     """
-    Run a workstation health check (system metrics only - v1).
+    Run a workstation health check (system + network - v2).
     """
     system_data = collect_system()
-    _print_system_report(system_data)
+    network_data = collect_network()
+
+    _print_section("System Health Check", system_data)
+    _print_section("Network Health Check", network_data)
+    print("\nScan complete.")
