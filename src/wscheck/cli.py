@@ -1,13 +1,16 @@
 import typer
 
-app = typer.Typer()
+app = typer.Typer(help="wscheck - Workstation Health Check CLI")
 
-@app.command()
-def hello():
-    print("wscheck prêt")
-
+@app.callback()
 def main():
-    app()
+    """
+    Outil CLI pour diagnostiquer l'état d'un poste (Windows).
+    """
+    # callback = commande racine (sans action par défaut)
+    pass
 
-if __name__ == "__main__":
-    main()
+@app.command("hello")
+def hello():
+    """Commande de test"""
+    print("wscheck prêt")
