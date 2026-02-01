@@ -1,17 +1,26 @@
 import psutil
 
-DEFAULT_EXPECTED_PROCESSES = [
-    "OneDrive.exe",
-    "Teams.exe",
-    "Code.exe",
-    "chrome.exe",
-    "python.exe",
-]
+PROCESS_PROFILES: dict[str, list[str]] = {
+    "generic": [
+        "OneDrive.exe",
+        "Teams.exe",
+        "chrome.exe",
+    ],
+    "office": [
+        "OneDrive.exe",
+        "Teams.exe",
+        "chrome.exe",
+    ],
+    "dev": [
+        "Code.exe",
+        "python.exe",
+    ],
+}
 
 
-def collect_services(expected: list[str] | None = None) -> dict:
+def collect_services(profile: str = "generic") -> dict:
     
-    expected = expected or DEFAULT_EXPECTED_PROCESSES
+    expected = PROCESS_PROFILES.get(profile, PROCESS_PROFILES["generic"])
 
     running_names: set[str] = set()
     for proc in psutil.process_iter(attrs=["name"]):
@@ -36,6 +45,7 @@ def collect_services(expected: list[str] | None = None) -> dict:
         status = "WARNING"
 
     return {
+        "profile": profile,
         "expected": expected,
         "running_count": len(found),
         "expected_count": len(expected),

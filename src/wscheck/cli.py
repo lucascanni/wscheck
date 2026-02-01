@@ -2,7 +2,7 @@ import typer
 
 from wscheck.checks.system import collect_system
 from wscheck.checks.network import collect_network
-from wscheck.checks.services import collect_services
+from wscheck.checks.services import collect_services, PROCESS_PROFILES
 from wscheck.checks.scoring import compute_health
 
 app = typer.Typer(help="wscheck - Workstation Health Check CLI")
@@ -15,14 +15,12 @@ def main():
     """
     pass
 
-
 @app.command("test")
 def test():
     """
     Test command to verify the CLI is working.
     """
     print("wscheck ready")
-
 
 def _print_section(title: str, data: dict) -> None:
     """
@@ -35,13 +33,25 @@ def _print_section(title: str, data: dict) -> None:
 
 
 @app.command("scan")
-def scan():
+def scan(
+    profile: str = typer.Option(
+        "generic",
+        help="Workstation profile: generic | office | dev",
+        case_sensitive=False,
+    )
+):
     """
-    Run a workstation health check (system + network + services + scoring).
+    Run a workstation health check using a specific profile.
     """
+    if profile not in PROCESS_PROFILES:
+        typer.echo(f"Unknown profile '{profile}'. Available profiles:")
+        for p in PROCESS_PROFILES:
+            typer.echo(f"  - {p}")
+        raise typer.Exit(code=2)
+
     system_data = collect_system()
     network_data = collect_network()
-    services_data = collect_services()
+    services_data = collect_services(profile=profile)
 
     data = {
         "system": system_data,
@@ -53,7 +63,8 @@ def scan():
 
     _print_section("System Health Check", system_data)
     _print_section("Network Health Check", network_data)
-    _print_section("Services/Processes Check", services_data)
+    _print_section("Services / Processes Check", services_data)
     _print_section("Global Health", global_health)
+
 
     print("\nHealth check complete.")
