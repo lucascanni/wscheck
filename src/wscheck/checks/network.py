@@ -5,9 +5,7 @@ import requests
 
 
 def _dns_ok(host: str = "google.com") -> bool:
-    """
-    Resolve a hostname to check DNS availability.
-    """
+    
     try:
         socket.gethostbyname(host)
         return True
@@ -16,10 +14,7 @@ def _dns_ok(host: str = "google.com") -> bool:
 
 
 def _tcp_latency_ms(host: str, port: int, timeout: float = 2.0) -> float | None:
-    """
-    Measure connectivity/latency by attempting a TCP connection.
-    Returns latency in milliseconds, or None if it fails.
-    """
+    
     start = time.time()
     try:
         with socket.create_connection((host, port), timeout=timeout):
@@ -29,9 +24,7 @@ def _tcp_latency_ms(host: str, port: int, timeout: float = 2.0) -> float | None:
 
 
 def _http_ok(url: str = "https://www.google.com", timeout: float = 3.0) -> bool:
-    """
-    Perform a simple HTTP GET to verify internet access.
-    """
+    
     try:
         r = requests.get(url, timeout=timeout)
         return r.status_code < 500
@@ -40,12 +33,7 @@ def _http_ok(url: str = "https://www.google.com", timeout: float = 3.0) -> bool:
 
 
 def collect_network() -> dict:
-    """
-    Collect basic network health metrics.
-
-    Returns:
-        dict: DNS status, TCP latency and HTTP reachability with a status label
-    """
+    
     dns_ok = _dns_ok("google.com")
 
     latency_ms = _tcp_latency_ms("1.1.1.1", 53, timeout=2.0)  

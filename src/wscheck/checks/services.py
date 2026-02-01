@@ -10,15 +10,7 @@ DEFAULT_EXPECTED_PROCESSES = [
 
 
 def collect_services(expected: list[str] | None = None) -> dict:
-    """
-    Check whether expected processes are currently running.
-
-    Args:
-        expected: list of process names to look for (case-insensitive)
-
-    Returns:
-        dict: running/missing processes + status label
-    """
+    
     expected = expected or DEFAULT_EXPECTED_PROCESSES
 
     running_names: set[str] = set()
