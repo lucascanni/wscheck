@@ -8,9 +8,11 @@ from wscheck.report import export_json, export_csv
 
 from datetime import datetime
 from pathlib import Path
+from rich.console import Console
+from rich.table import Table
 
 app = typer.Typer(help="wscheck - Workstation Health Check CLI")
-
+console = Console()
 
 @app.callback()
 def main():
@@ -18,6 +20,49 @@ def main():
     CLI tool to diagnose the health of a Windows workstation.
     """
     pass
+
+def _render_rich_report(data: dict) -> None:
+    """
+    Render the scan results in a Rich table.
+    """
+    sysd = data.get("system", {})
+    netd = data.get("network", {})
+    svcd = data.get("services", {})
+    health = data.get("health", {})
+
+    table = Table(title="Workstation Health Check")
+
+    table.add_column("Category", style="bold")
+    table.add_column("Summary")
+    table.add_column("Status", style="bold")
+
+    table.add_row(
+        "System",
+        f"CPU {sysd.get('cpu_percent')}% | RAM {sysd.get('ram_percent')}% | Disk {sysd.get('disk_percent')}% ({sysd.get('system_drive')})",
+        str(sysd.get("status")),
+    )
+
+    table.add_row(
+        "Network",
+        f"DNS {netd.get('dns_ok')} | HTTP {netd.get('http_ok')} | TCP latency {netd.get('tcp_latency_ms')}ms",
+        str(netd.get("status")),
+    )
+
+    missing = svcd.get("missing", []) or []
+    table.add_row(
+        "Services",
+        f"Profile {svcd.get('profile')} | Running {svcd.get('running_count')}/{svcd.get('expected_count')} | Missing: {', '.join(missing) if missing else 'None'}",
+        str(svcd.get("status")),
+    )
+
+    issues = health.get("issues", []) or []
+    table.add_row(
+        "Global",
+        f"Score {health.get('score')}/100 | Issues: {', '.join(issues) if issues else 'None'}",
+        str(health.get("status")),
+    )
+
+    console.print(table)
 
 @app.command("test")
 def test():
@@ -48,6 +93,10 @@ def scan(
         help="Export format: none | json | csv | both",
         case_sensitive=False,
     ),
+    pretty: bool = typer.Option(
+        True,
+        help="Pretty terminal output (Rich table). Disable for plain text output.",
+    ),
 ):
     """
     Run a workstation health check using a specific profile.
@@ -71,10 +120,13 @@ def scan(
     global_health = compute_health(data)
     data["health"] = global_health
 
-    _print_section("System Health Check", system_data)
-    _print_section("Network Health Check", network_data)
-    _print_section("Services / Processes Check", services_data)
-    _print_section("Global Health", global_health)
+    if pretty:
+        _render_rich_report(data)
+    else:
+        _print_section("System Health Check", system_data)
+        _print_section("Network Health Check", network_data)
+        _print_section("Services / Processes Check", services_data)
+        _print_section("Global Health", global_health)
 
     report_dir = Path("data/reports")
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
