@@ -2,6 +2,7 @@ import typer
 
 from wscheck.checks.system import collect_system
 from wscheck.checks.network import collect_network
+from wscheck.checks.services import collect_services
 
 app = typer.Typer(help="wscheck - Workstation Health Check CLI")
 
@@ -35,11 +36,13 @@ def _print_section(title: str, data: dict) -> None:
 @app.command("scan")
 def scan():
     """
-    Run a workstation health check (system + network - v2).
+    Run a workstation health check (system + network + services - v3).
     """
     system_data = collect_system()
     network_data = collect_network()
+    services_data = collect_services()
 
     _print_section("System Health Check", system_data)
     _print_section("Network Health Check", network_data)
-    print("\nScan complete.")
+    _print_section("Services/Processes Check", services_data)
+    print("\nHealth check complete.")
