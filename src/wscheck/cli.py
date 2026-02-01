@@ -65,6 +65,10 @@ def scan(
     _print_section("Network Health Check", network_data)
     _print_section("Services / Processes Check", services_data)
     _print_section("Global Health", global_health)
-
+    
+    if global_health["status"] == "CRITICAL":
+        raise typer.Exit(code=2)
+    if global_health["status"] == "WARNING":
+        raise typer.Exit(code=1)
 
     print("\nHealth check complete.")
