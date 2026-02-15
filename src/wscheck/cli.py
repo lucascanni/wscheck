@@ -1,4 +1,5 @@
 import typer
+import json
 
 from wscheck.checks.system import collect_system
 from wscheck.checks.network import collect_network
@@ -97,6 +98,11 @@ def scan(
         True,
         help="Pretty terminal output (Rich table). Disable for plain text output.",
     ),
+    output: str = typer.Option(
+        "text",
+        help="Output format to STDOUT: text | json",
+        case_sensitive=False,
+    ),
 ):
     """
     Run a workstation health check using a specific profile.
@@ -119,6 +125,14 @@ def scan(
 
     global_health = compute_health(data)
     data["health"] = global_health
+
+    if output == "json":
+        typer.echo(json.dumps(data, indent=2))
+        if global_health["status"] == "CRITICAL":
+            raise typer.Exit(code=2)
+        if global_health["status"] == "WARNING":
+            raise typer.Exit(code=1)
+        return
 
     if pretty:
         _render_rich_report(data)
