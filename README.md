@@ -1,4 +1,4 @@
-#  wscheck
+#  wscheck ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 `wscheck` is a Python CLI tool designed to assess the health of a Windows workstation.
 
@@ -74,7 +74,7 @@ Checks for expected running processes.
 wscheck --version
 ```
 
-#  Project Structure
+##  Project Structure
 
     src/wscheck/
     │
@@ -92,37 +92,37 @@ Reports and logs are stored in:
 
     data/reports/
 
-# 📦 Installation
+##  Installation
 
-## 1️⃣ Clone repository
+### 1️ Clone repository
 
 ``` bash
 git clone https://github.com/yourusername/wscheck.git
 cd wscheck
 ```
 
-## 2️⃣ Create virtual environment
+### 2️ Create virtual environment
 
 ``` powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
-## 3️⃣ Install project
+### 3️ Install project
 
 ``` powershell
 pip install -e .
 ```
 
-# 🧪 Usage
+##  Usage
 
-## Basic scan
+### Basic scan
 
 ``` powershell
 wscheck scan
 ```
 
-## Select profile
+### Select profile
 
 ``` powershell
 wscheck scan --profile generic
@@ -130,13 +130,13 @@ wscheck scan --profile office
 wscheck scan --profile dev
 ```
 
-### Available profiles
+## Available profiles
 
 -   `generic`
 -   `office`
 -   `dev`
 
-# 📤 Export Reports
+##  Export Reports
 
 ``` powershell
 wscheck scan --export json
@@ -152,9 +152,7 @@ Example filename:
 
     wscheck_report_2026-02-15_14-32-10.json
 
-------------------------------------------------------------------------
-
-# 📦 Output to JSON (STDOUT)
+##  Output to JSON (STDOUT)
 
 Useful for scripting and automation:
 
@@ -168,23 +166,21 @@ Example usage in PowerShell:
 wscheck scan --output json | Out-File report.json
 ```
 
-------------------------------------------------------------------------
+##  Terminal Display Modes
 
-# 🎨 Terminal Display Modes
-
-## Rich table (default)
+### Rich table (default)
 
 ``` powershell
 wscheck scan
 ```
 
-## Plain text
+### Plain text
 
 ``` powershell
 wscheck scan --no-pretty
 ```
 
-# 🔢 Exit Codes
+## Exit Codes
 
   Code   Meaning
   ------ ----------
@@ -199,7 +195,7 @@ wscheck scan
 echo $LASTEXITCODE
 ```
 
-# 📝 Logging
+## Logging
 
 Logs are written to:
 
@@ -220,23 +216,23 @@ Enable verbose mode:
 wscheck scan --verbose
 ```
 
-# ⚙️ Profiles
+## Profiles
 
 Profiles define which processes must be running.
 
-## generic
+### generic
 
 -   OneDrive
 -   Teams
 -   Chrome browser
 
-## office
+### office
 
 -   OneDrive
 -   Teams
 -   Chrome browser
 
-## dev
+### dev
 
 -   VS Code
 -   Python
@@ -245,7 +241,7 @@ Profiles can be extended in:
 
     checks/services.py
 
-# 📈 Example Output
+## Example Output
 
     ┏━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┓
     ┃ Category  ┃ Summary                              ┃ Status   ┃
@@ -256,7 +252,7 @@ Profiles can be extended in:
     │ Global    │ Score 100/100 | Issues: None         │ OK       │
     └───────────┴──────────────────────────────────────┴──────────┘
 
-# 🎯 Use Cases
+## Use Cases
 
 -   IT support diagnostics
 -   Pre-deployment validation
@@ -265,18 +261,24 @@ Profiles can be extended in:
 -   Integration with automation scripts
 -   Educational CLI architecture example
 
-# 🔐 Safety
+## Safety
 
 -   Read-only checks (no destructive operations)
 -   No elevation required
 -   No external telemetry
 -   Local-only analysis
 
-# 🧑‍💻 Author
+## Author
 
 Built as an IT automation and system diagnostics tool.
 
-# 🚀 Roadmap (v2 ideas)
+## License
+
+MIT License © 2026 Lucas Cannizzaro
+
+See the [LICENSE](LICENSE) file for details.
+
+## Roadmap (v2 ideas)
 
 -   Config file support (YAML/JSON)
 -   Baseline comparison
