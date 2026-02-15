@@ -6,14 +6,17 @@ from wscheck.checks.network import collect_network
 from wscheck.checks.services import collect_services, PROCESS_PROFILES
 from wscheck.checks.scoring import compute_health
 from wscheck.report import export_json, export_csv
+from wscheck.logger import get_logger
 
 from datetime import datetime
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
+
 app = typer.Typer(help="wscheck - Workstation Health Check CLI")
 console = Console()
+logger = get_logger()
 
 @app.callback()
 def main():
@@ -103,10 +106,17 @@ def scan(
         help="Output format to STDOUT: text | json",
         case_sensitive=False,
     ),
+    verbose: bool = typer.Option(
+        False,
+        help="Enable verbose logging.",
+    ),
 ):
     """
     Run a workstation health check using a specific profile.
     """
+    if verbose:
+        logger.setLevel("DEBUG")
+
     if profile not in PROCESS_PROFILES:
         typer.echo(f"Unknown profile '{profile}'. Available profiles:")
         for p in PROCESS_PROFILES:
@@ -125,6 +135,28 @@ def scan(
 
     global_health = compute_health(data)
     data["health"] = global_health
+    logger.info("Scan started | profile=%s", profile)
+    logger.info("System status=%s | CPU=%s RAM=%s DISK=%s",
+                system_data.get("status"),
+                system_data.get("cpu_percent"),
+                system_data.get("ram_percent"),
+                system_data.get("disk_percent"))
+
+    logger.info("Network status=%s | DNS=%s HTTP=%s LAT=%s",
+                network_data.get("status"),
+                network_data.get("dns_ok"),
+                network_data.get("http_ok"),
+                network_data.get("tcp_latency_ms"))
+
+    logger.info("Services status=%s | missing=%s",
+                services_data.get("status"),
+                ", ".join(services_data.get("missing", []) or []) or "None")
+
+    logger.info("Global status=%s | score=%s | issues=%s",
+                global_health.get("status"),
+                global_health.get("score"),
+                ", ".join(global_health.get("issues", []) or []) or "None")
+
 
     if output == "json":
         typer.echo(json.dumps(data, indent=2))
@@ -149,11 +181,13 @@ def scan(
         json_path = report_dir / f"wscheck_report_{timestamp}.json"
         export_json(data, json_path)
         typer.echo(f"Exported JSON -> {json_path}")
+        logger.info("Exported JSON report -> %s", json_path)
 
     if export in ("csv", "both"):
         csv_path = report_dir / f"wscheck_report_{timestamp}.csv"
         export_csv(data, csv_path)
         typer.echo(f"Exported CSV  -> {csv_path}")
+        logger.info("Exported CSV report -> %s", csv_path)
 
 
     if global_health["status"] == "CRITICAL":
