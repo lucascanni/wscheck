@@ -7,6 +7,7 @@ from wscheck.checks.services import collect_services, PROCESS_PROFILES
 from wscheck.checks.scoring import compute_health
 from wscheck.report import export_json, export_csv
 from wscheck.logger import get_logger
+from wscheck import __version__
 
 from datetime import datetime
 from pathlib import Path
@@ -14,16 +15,29 @@ from rich.console import Console
 from rich.table import Table
 
 
-app = typer.Typer(help="wscheck - Workstation Health Check CLI")
+app = typer.Typer(
+    help="wscheck - Workstation Health Check CLI",
+    add_completion=False,
+)
 console = Console()
 logger = get_logger()
 
-@app.callback()
-def main():
+@app.callback(invoke_without_command=True)
+def main(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        help="Show installed version.",
+        is_eager=True,
+    )
+):
     """
     CLI tool to diagnose the health of a Windows workstation.
     """
-    pass
+    if version:
+        typer.echo(f"wscheck {__version__}")
+        raise typer.Exit()
+    return
 
 def _render_rich_report(data: dict) -> None:
     """
